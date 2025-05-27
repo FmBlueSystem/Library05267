@@ -1,0 +1,124 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+.env
+.venv
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+*.swo
+*.swp
+*.swn
+*.bak
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+.tox/
+.nox/
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# Documentation
+docs/_build/
+docs/api/_autosummary/
+docs/api/generated/
+docs/_static/
+docs/_templates/
+
+# Build
+*.spec
+*.manifest
+*.application
+*.exe
+*.msi
+*.dmg
+*.pkg
+*.deb
+*.rpm
+*.AppImage
+
+# Application Data
+*.db
+*.db-journal
+logs/
+cache/
+.config/
+*.log
+*.pid
+
+# Assets
+assets/fonts/
+assets/icons/
+assets/i18n/*.qm
+
+# Qt/PyQt
+*.qrc.py
+*.ui.py
+*_rc.py
+*_ui.py
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Project Specific
+# Audio Files
+*.mp3
+*.wav
+*.flac
+*.m4a
+*.ogg
+*.wma
+
+# Playlists
+*.m3u
+*.m3u8
+*.pls
+
+# Analysis Data
+*.npy
+*.npz
+*.json
+*.csv
+
+# Backup Files
+*.bak
+*~
+*.old
+*.orig
