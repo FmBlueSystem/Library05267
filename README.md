@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Nueva Biblioteca 🎵
 
 Sistema de biblioteca musical con playlists inteligentes y análisis avanzado de audio.
@@ -174,3 +175,7 @@ Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](L
 Desarrollado por [FmBlueSystem](https://fmbluesystem.com).
 
 Iconos por [Material Design](https://material.io/icons/).
+=======
+# Library05267
+Nueva libreria
+>>>>>>> d4cc42a30de6c31b9ed3cb262f0480c8f50de258
