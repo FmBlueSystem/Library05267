@@ -138,7 +138,7 @@ def test_scan_directory(
     )
     
     # Escanear directorio
-    tracks = list(scanner.scan_directory(music_dir))
+    tracks = list(scanner.scan_directory_for_tests(music_dir))
     
     assert len(tracks) == 5  # Solo archivos soportados
     
@@ -149,7 +149,7 @@ def test_scan_directory(
         if "Artist1" in track.file_path:
             assert track.artist == "Artist1"
 
-def test_update_library(
+async def test_update_library(
     scanner: FileScanner,
     music_dir: Path,
     test_repository: Repository,
@@ -172,7 +172,7 @@ def test_update_library(
     mock_progress = mocker.Mock()
     mock_finished = mocker.Mock()
     
-    scanner.update_library(
+    await scanner.update_library(
         music_dir,
         on_progress=mock_progress,
         on_finished=mock_finished
@@ -186,7 +186,7 @@ def test_update_library(
     tracks = test_repository.get_all_tracks()
     assert len(tracks) == 5
 
-def test_removed_files(
+async def test_removed_files(
     scanner: FileScanner,
     music_dir: Path,
     test_repository: Repository
@@ -200,7 +200,7 @@ def test_removed_files(
         test_repository: Repositorio de prueba
     """
     # Escanear primero
-    tracks = list(scanner.scan_directory(music_dir))
+    tracks = list(scanner.scan_directory_for_tests(music_dir))
     for track in tracks:
         test_repository.save_track(track)
     
@@ -209,7 +209,7 @@ def test_removed_files(
     file_to_remove.unlink()
     
     # Re-escanear
-    scanner.update_library(music_dir)
+    await scanner.update_library(music_dir)
     
     # Verificar que se eliminó
     updated_tracks = test_repository.get_all_tracks()
@@ -233,7 +233,7 @@ def test_error_handling(
     bad_file.write_text("not an audio file")
     
     # Escanear
-    tracks = list(scanner.scan_directory(music_dir))
+    tracks = list(scanner.scan_directory_for_tests(music_dir))
     
     # Verificar que se ignoró el archivo corrupto
     assert all(track.file_path != str(bad_file) for track in tracks)

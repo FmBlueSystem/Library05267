@@ -250,7 +250,7 @@ class FileScanner:
         info['title'] = name
         return info
     
-    def scan_directory(self, directory: Path, recursive: bool = True) -> list:
+    def scan_directory_for_tests(self, directory: Path, recursive: bool = True) -> list:
         """
         Escanea directorio y retorna lista de tracks (versión síncrona para tests).
         
@@ -309,7 +309,7 @@ class FileScanner:
             logging.error(f"Error escaneando directorio {directory}: {e}")
             return []
     
-    def update_library(self, directory: Path, on_progress=None, on_finished=None):
+    async def update_library(self, directory: Path, on_progress=None, on_finished=None):
         """
         Actualiza la biblioteca con archivos del directorio.
         
@@ -319,19 +319,54 @@ class FileScanner:
             on_finished: Callback de finalización
         """
         try:
-            tracks = self.scan_directory(directory)
+            # Use the async scan_directory which returns List[AudioMetadata]
+            metadatas = await self.scan_directory(str(directory))
             
             if self.repository:
-                for i, track in enumerate(tracks):
+                from nueva_biblioteca.data.models import Track  # Import Track model
+                num_metadatas = len(metadatas)
+                for i, metadata_obj in enumerate(metadatas):
                     try:
-                        self.repository.save_track(track)
-                        if on_progress:
-                            on_progress(i + 1, len(tracks), track.file_path)
+                        file_path_obj = Path(metadata_obj.file_path)
+                        
+                        # Attempt to parse filename for title/artist if not in metadata
+                        parsed_info = self.parse_filename(file_path_obj.name)
+                        title = metadata_obj.title or parsed_info.get('title', file_path_obj.stem)
+                        artist = metadata_obj.artist or parsed_info.get('artist')
+
+                        track = Track(
+                            file_path=metadata_obj.file_path,
+                            title=title,
+                            artist=artist,
+                            album=metadata_obj.album,
+                            year=metadata_obj.year,
+                            genre=', '.join(metadata_obj.genre) if metadata_obj.genre else None,
+                            duration=metadata_obj.duration,
+                            format=metadata_obj.format,
+                            bitrate=metadata_obj.bitrate,
+                            sample_rate=metadata_obj.sample_rate,
+                            channels=metadata_obj.channels,
+                            bpm=metadata_obj.bpm, # Assumes AudioMetadata might have these
+                            key=metadata_obj.key,   # Assumes AudioMetadata might have these
+                            energy=None, # Placeholder, AudioMetadata might not have 'energy' from basic scan
+                            file_size=metadata_obj.file_size
+                        )
+                        
+                        # Infer artist from directory structure if still not available
+                        if not track.artist:
+                            parts = file_path_obj.parts
+                            if len(parts) >= 3: # e.g., /path/to/Artist/Album/file.mp3
+                                # This logic might need to be more robust depending on base music_folder
+                                track.artist = parts[-3] 
+
+                        saved_track = self.repository.save_track(track)
+                        if saved_track and on_progress:
+                            on_progress(i + 1, num_metadatas, saved_track.file_path)
                     except Exception as e:
-                        logging.error(f"Error guardando track {track.file_path}: {e}")
+                        logging.error(f"Error processing/saving metadata for {metadata_obj.file_path}: {e}")
             
             if on_finished:
-                on_finished(len(tracks))
+                on_finished(len(metadatas))
                 
         except Exception as e:
             logging.error(f"Error actualizando biblioteca: {e}")
